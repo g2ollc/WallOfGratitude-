@@ -77,14 +77,24 @@ function renderCards() {
   cards.style.setProperty('--cols', cols.value);
   cards.style.setProperty('--card-font', size.value);
   // Author is intentionally left off the printed cards.
-  cards.replaceChildren(
-    ...list.map((c) =>
-      el('article', { className: 'card' }, [
-        el('div', { className: 'to' }, ['To ', el('strong', { textContent: c.to })]),
-        el('p', { className: 'text', textContent: c.message }),
-      ])
-    )
-  );
+  // Cards are laid out in rows: every card in a row gets the row's height and
+  // columns sit at the same spot on every row, so each row can be cut straight
+  // across the page and then into cards. A row never splits across pages.
+  const perRow = Number(cols.value);
+  const rowEls = [];
+  for (let i = 0; i < list.length; i += perRow) {
+    rowEls.push(
+      el('div', { className: 'card-row' },
+        list.slice(i, i + perRow).map((c) =>
+          el('article', { className: 'card' }, [
+            el('div', { className: 'to' }, ['To ', el('strong', { textContent: c.to })]),
+            el('p', { className: 'text', textContent: c.message }),
+          ])
+        )
+      )
+    );
+  }
+  cards.replaceChildren(...rowEls);
 }
 
 async function remove(c) {

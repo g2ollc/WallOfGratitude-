@@ -182,24 +182,40 @@ td button { padding: 0.35rem 0.7rem; font-size: 0.85rem; }
 /* ---------- printable cards ---------- */
 
 .cards {
-  column-count: var(--cols, 3);
-  column-gap: 0.15in;
   background: #fff;
   padding: 0.25in;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   font-size: var(--card-font, 11pt);
 }
-.card {
+/* Grid of rows with shared cut lines: cards in a row stretch to the same height,
+   and every row uses the same column widths, so all cut lines run straight. */
+.card-row {
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr));
   break-inside: avoid;
   page-break-inside: avoid;
+}
+.card-row + .card-row { margin-top: -1px; } /* overlap so neighbouring rows share one cut line */
+.card {
+  position: relative;
   border: 1px dashed var(--pathway-mid);
-  border-left: 4px solid var(--city);
-  border-radius: 6px;
-  padding: 0.12in 0.15in;
-  margin-bottom: 0.15in;
+  border-left: 0;
+  padding: 0.14in 0.18in 0.14in 0.3in;
   background: #fff;
   color: var(--dark);
+}
+.card:first-child { border-left: 1px dashed var(--pathway-mid); }
+/* City accent sits inside the card so it never gets in the way of a cut */
+.card::before {
+  content: '';
+  position: absolute;
+  left: 0.14in;
+  top: 0.14in;
+  bottom: 0.14in;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--city);
 }
 .card .to {
   font-size: 0.78em;
@@ -217,9 +233,5 @@ td button { padding: 0.35rem 0.7rem; font-size: 0.85rem; }
   .no-print { display: none !important; }
   .admin-page { max-width: none; padding: 0; }
   .cards { border: 0; padding: 0; border-radius: 0; }
-  .card { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-}
-
-@media (max-width: 600px) {
-  .cards { column-count: 1; }
+  .card, .card::before { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
